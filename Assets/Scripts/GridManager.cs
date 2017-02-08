@@ -9,6 +9,7 @@ public class GridManager : MonoBehaviour
     public event Action<GridTile> OnStreetTileClicked;
     public event Action<GridTile> OnBuildingTileClicked;
     public event Action<GridTile> OnCrimeStarted;
+    public event Action<GridTile, int> OnTileHover;
 
     public List<GridTile>   tiles;
     public List<GridTile>   streetTiles;
@@ -32,6 +33,7 @@ public class GridManager : MonoBehaviour
         {
             __tile.OnMouseClick += TileClicked;
             __tile.OnCrimeStarted += CrimeStarted;
+            __tile.OnMouseHover += OnTileHover;
             if (__tile.tileType == GridTile.TileType.STREET)
                 streetTiles.Add(__tile);
             else
@@ -72,7 +74,19 @@ public class GridManager : MonoBehaviour
         else if (p_tile.tileType == GridTile.TileType.BUILDING && OnBuildingTileClicked != null)
             OnBuildingTileClicked(p_tile);
     }
-
+    public void EnableTilePlacementIcons(bool p_enable, TileType p_type)
+    {
+        if (p_type == TileType.STREET)
+        {
+            foreach (GridTile __tile in streetTiles)
+                __tile.tileSprite.enabled = p_enable;
+        }
+        else
+        {
+            foreach (GridTile __tile in buildingTiles)
+                __tile.tileSprite.enabled = p_enable;
+        }
+    }
     public void ShowBuildingRoute(BuildingRoute p_route, bool p_showRoute)
     {
         Orientation __currentOri;
@@ -103,11 +117,8 @@ public class GridManager : MonoBehaviour
     }
     private void SetTileRoute(GridTile p_tile, bool p_showRoute, int p_routeSprite, Orientation p_orientation, bool p_flipX = false)
     {
-        if (!p_showRoute)
-        {
-            p_tile.routeSprite.sortingOrder = 0;
-        }
-        else
+        p_tile.routeSprite.enabled = p_showRoute;
+        if (p_showRoute)
         {
             p_tile.routeSprite.sortingOrder = 110;
             p_tile.routeSprite.sprite = routeSprites[p_routeSprite];

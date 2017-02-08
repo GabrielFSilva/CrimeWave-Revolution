@@ -12,10 +12,10 @@ public class GridTile : MonoBehaviour
         STREET,
         BUILDING
     }
-    public TileType tileType = TileType.STREET;
-    public int tileX;
-    public int tileY;
-    public SpriteRenderer tileSprite;
+    public TileType             tileType = TileType.STREET;
+    public int                  tileX;
+    public int                  tileY;
+    public SpriteRenderer       tileSprite;
 
     public Building             linkedBuilding;
     public GameObject           routePrefab;
@@ -29,6 +29,7 @@ public class GridTile : MonoBehaviour
     [SerializeField]
     private float               crimeStartTimer;
     public bool                 crimeSpotted = false;
+
     private void Awake()
     {
         name = "Tile_" + tileX.ToString() + "_" + tileY.ToString();
@@ -37,12 +38,14 @@ public class GridTile : MonoBehaviour
         {
             tileType = TileType.BUILDING;
         }
-        routeSprite.color = new Color(0f, 0f, 1f, 0.6f);
+        tileSprite.color = new Color(1f, 1f, 1f, 0.6f);
     }
     private void Start()
     {
         routeSprite =  ((GameObject)Instantiate(routePrefab, transform.position, Quaternion.identity, transform))
             .GetComponent<SpriteRenderer>();
+        routeSprite.color = new Color(0f, 0f, 1f, 0.6f);
+        routeSprite.enabled = false;
         crimeRateIndicator = ((GameObject)Instantiate(crimeRatePrefab, transform.position, Quaternion.identity, transform))
             .GetComponent<CrimeRateIndicator>();
         crimeBaseTimer = 70f / (CrimeManager.CrimesPerSecond * crimeRate);
@@ -60,28 +63,6 @@ public class GridTile : MonoBehaviour
                 ResetCrimeTimer();
             }
         }
-        /*
-        //SortingOrder
-        if (GameSceneManager.gameState == GameSceneManager.GameStateType.BUYING_POLICE_CAMERA)
-        {
-            if (tileType == TileType.STREET)
-                spriteRenderer.sortingOrder = 110;
-            else
-                spriteRenderer.sortingOrder = 0;
-        }
-        else if (GameSceneManager.gameState == GameSceneManager.GameStateType.BUYING_POLICE_STATION)
-        {
-           
-            if (tileType == TileType.BUILDING)
-                spriteRenderer.sortingOrder = 110;
-            else
-                spriteRenderer.sortingOrder = 0;
-        }
-        else if (GameSceneManager.gameState == GameSceneManager.GameStateType.NORMAL 
-            || (GameSceneManager.gameState >= GameSceneManager.GameStateType.EDITING_POLICE_CAMERA 
-            && GameSceneManager.gameState <= GameSceneManager.GameStateType.EDITING_SCHOOL))
-            spriteRenderer.sortingOrder = 0;
-            */
     }
     private void OnMouseEnter()
     {

@@ -44,6 +44,7 @@ public class GameSceneManager : MonoBehaviour
         gridManager.OnStreetTileClicked += StreetTileClicked;
         gridManager.OnBuildingTileClicked += BuildingTileClicked;
         gridManager.OnCrimeStarted += CrimeStarted;
+        gridManager.OnTileHover += TileHover;
         buildingManager.OnBuildingHovered += BuildingHovered;
         unitsManager.OnUnitSelected += UnitSelected;
         unitsManager.OnUnitMoved += UnitMoved;
@@ -54,11 +55,6 @@ public class GameSceneManager : MonoBehaviour
     }
 
   
-
-    private void CrimeEnded()
-    {
-        uiManager.UpdateCrimeLabels(crimeManager.notseenCrimes, crimeManager.seenCrimes, crimeManager.stoppedCrimes);
-    }
 
     private void Update()
     {
@@ -113,6 +109,19 @@ public class GameSceneManager : MonoBehaviour
             UnitBought(unitEditingType);
         }
     }
+    private void TileHover(GridTile p_tile, int p_hoverStatus)
+    {
+        if (gameState == GameState.BUYING)
+        {
+            if (unitEditingType == UnitType.POLICE_CAMERA && p_tile.tileType == GridTile.TileType.STREET)
+                uiManager.unitPlacement.PlaceUnit(p_tile, unitEditingType);
+            else if (unitEditingType != UnitType.POLICE_CAMERA && p_tile.tileType == GridTile.TileType.BUILDING)
+                uiManager.unitPlacement.PlaceUnit(p_tile, unitEditingType);
+            else
+                uiManager.unitPlacement.ResetUnits();
+        }
+    }
+
     private void BuildingHovered(Building p_building, bool p_showRoute)
     {
         gridManager.ShowBuildingRoute(p_building.route, p_showRoute);
@@ -123,12 +132,17 @@ public class GameSceneManager : MonoBehaviour
         crimeManager.CheckSeenCrimes();
         crimeManager.CheckStoppedCrimes();
     }
+    private void CrimeEnded()
+    {
+        uiManager.UpdateCrimeLabels(crimeManager.notseenCrimes, crimeManager.seenCrimes, crimeManager.stoppedCrimes);
+    }
     #endregion
     #region UnitsActions
     private void UnitBought(UnitType p_type)
     {
         Money -= GameEconomy.GetUnitBuyPrice(UnitType.POLICE_STATION);
         uiManager.UpdateMoneyLabel();
+        uiManager.unitPlacement.ResetUnits();
         UpdateMonitoredTiles = true;
         ReturnToNormalState();
     }
@@ -154,6 +168,10 @@ public class GameSceneManager : MonoBehaviour
         gameState = GameState.PLAYING;
         uiManager.EnableNormalUI(true);
         uiManager.UpdateCancelButton(-1);
+        if (unitEditingType == UnitType.POLICE_CAMERA)
+            gridManager.EnableTilePlacementIcons(false, TileType.STREET);
+        else
+            gridManager.EnableTilePlacementIcons(false, TileType.BUILDING);
     }
     public void ShowEndGameScreen(bool p_isWin)
     {
@@ -171,11 +189,24 @@ public class GameSceneManager : MonoBehaviour
         {
             gameState = GameState.PLAYING;
         }
+        else if (p_unityTypeIndex == 5)
+            CancelButtonClicked();
         else if (GameEconomy.HaveEnoughMoney((UnitType)p_unityTypeIndex, Money))
         {
+            if (gameState == GameState.BUYING)
+            {
+                if (unitEditingType == UnitType.POLICE_CAMERA)
+                    gridManager.EnableTilePlacementIcons(false, TileType.STREET);
+                else
+                    gridManager.EnableTilePlacementIcons(false, TileType.BUILDING);
+            }
             gameState = GameState.BUYING;
             unitEditingType = (UnitType)p_unityTypeIndex;
             uiManager.UpdateCancelButton(p_unityTypeIndex);
+            if (unitEditingType == UnitType.POLICE_CAMERA)
+                gridManager.EnableTilePlacementIcons(true, TileType.STREET);
+            else
+                gridManager.EnableTilePlacementIcons(true, TileType.BUILDING);
         }
         //else
         //  ERROR SOUND
@@ -196,6 +227,7 @@ public class GameSceneManager : MonoBehaviour
     }
     public void CancelButtonClicked()
     {
+        uiManager.unitPlacement.ResetUnits();
         ReturnToNormalState();
     }
 

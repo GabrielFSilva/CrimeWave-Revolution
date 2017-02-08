@@ -8,24 +8,30 @@ public class UIManager : MonoBehaviour
     //Actions
     public event Action<int>    OnBuyButtonClicked;
     public event Action         OnSellButtonClicked;
+    public event Action         OnCancelButtonClicked;
     public event Action         OnRotateButtonClicked;
 
-    //State Containers
+    [Header("Managers")]
+    public UIUnitPlacementManager   unitPlacement;
+
+    [Header("State Containers")]
     public RectTransform        normalUIContainer;
     public RectTransform        sellUIContanier;
 
+    [Header("Buttons")]
     public List<RectTransform>  buyButtons;
     public RectTransform        cancelButton;
     public RectTransform        rotateButton;
 
-    //Labels
+    [Header("Labels")]
     public Text timeLabel;
     public Text moneyLabel;
     public Text sellButtonLabel;
 
     public Text         crimeLimitLabel;
     public List<Text>   crimeLabels;
-    
+
+    [Header("Images")]
     public Image        sellIconImage;
     public List<Sprite> sellIconSprites;
 
