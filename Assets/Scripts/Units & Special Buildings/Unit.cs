@@ -5,24 +5,25 @@ using System.Collections.Generic;
 
 public class Unit : MonoBehaviour
 {
-    public event Action<Unit> OnUnitClicked;
-    public event Action<Unit> OnPositionChange;
+    public event Action<Unit>   OnUnitClicked;
+    public event Action<Unit>   OnPositionChange;
 
-    public UnitType unitType;
-    public UnitTilePlacement unitTilePlacement;
+    public UnitType             unitType;
+    public UnitTilePlacement    unitTilePlacement;
 
     public GridTile             linkedTile;
     [Range(0,10)] public int    viewRange;
     public UnitViewType         viewType;
     public List<GridTile>       monitoredTiles;
-
-    public Orientation  unitOrientation;
-    public bool         mouseHover = false;
     
-    public Animator         unitAnimator;
-    public SpriteRenderer   unitSprite;
-    public SpriteRenderer   unitViewRangeSprite;
-    public BoxCollider2D    unitCollider;
+    public Orientation          unitOrientation;
+    public bool                 mouseHover = false;
+    
+    public Animator             unitAnimator;
+    public SpriteRenderer       unitSprite;
+    public SpriteRenderer       unitViewRangeSprite;
+    public List<SpriteRenderer> unitLinearViewRangeSprites;
+    public BoxCollider2D        unitCollider;
 
     private void Update()
     {
@@ -73,6 +74,20 @@ public class Unit : MonoBehaviour
         {
             if (p_data != null)
                 monitoredTiles.Add(p_data[i]);
+        }
+        //Update linear view range sprites. Only for cameras.
+        if (unitLinearViewRangeSprites.Count > 0)
+        {
+            //Disable All
+            for (int i = 0; i < unitLinearViewRangeSprites.Count; i++)
+                unitLinearViewRangeSprites[i].enabled = false;
+            for(int i = 1; i < p_data.Count; i++)
+            {
+                if (p_data[i] != null && p_data[i].tileType != GridTile.TileType.BUILDING)
+                    unitLinearViewRangeSprites[i - 1].enabled = true;
+                else
+                    break;
+            }
         }
     }
     

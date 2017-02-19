@@ -156,14 +156,19 @@ public class GridManager : MonoBehaviour
     }
     private void SetMonitoredTilesToUnit(Unit p_unit)
     {
-        p_unit.monitoredTiles = new List<GridTile>();
+        List<GridTile> __monitoredTiles = new List<GridTile>();
         if (p_unit.viewType == UnitViewType.LINEAR)
         {
-            for (int i = 0; i < p_unit.viewRange; i++)
+            GridTile __tile;
+            //__monitoredTiles.Add()
+            for (int i = 0; i <= p_unit.viewRange; i++)
             {
-                p_unit.monitoredTiles.Add(GetTileByIndex(
-                    p_unit.linkedTile.tileX + (Enums.GetOrientationX(p_unit.unitOrientation) * i),
-                    p_unit.linkedTile.tileY + (Enums.GetOrientationY(p_unit.unitOrientation) * i)));
+                __tile = GetTileByIndex(p_unit.linkedTile.tileX + (Enums.GetOrientationX(p_unit.unitOrientation) * i),
+                    p_unit.linkedTile.tileY + (Enums.GetOrientationY(p_unit.unitOrientation) * i));
+                if (__tile == null || __tile.tileType == GridTile.TileType.BUILDING)
+                    break;
+                else
+                    __monitoredTiles.Add(__tile);
             }
         }
         else
@@ -174,10 +179,11 @@ public class GridManager : MonoBehaviour
                 //Column
                 for (int j = p_unit.linkedTile.tileX - p_unit.viewRange; j <= p_unit.linkedTile.tileX + p_unit.viewRange; j++)
                 {
-                    p_unit.monitoredTiles.Add(GetTileByIndex(j, i));
+                    __monitoredTiles.Add(GetTileByIndex(j, i));
                 }
             }
         }
+        p_unit.UpdateMonitoredTiles(__monitoredTiles);
     }
     private void AddTilesToMonitoredList(List<GridTile> p_tiles)
     {
