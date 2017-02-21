@@ -134,7 +134,8 @@ public class GameSceneManager : MonoBehaviour
     }
     private void CrimeEnded()
     {
-        uiManager.UpdateCrimeLabels(crimeManager.notseenCrimes, crimeManager.seenCrimes, crimeManager.stoppedCrimes);
+        uiManager.UpdateCrimeBars(crimeLimit ,crimeManager.notseenCrimes, 
+            crimeManager.seenCrimes, crimeManager.stoppedCrimes);
     }
     #endregion
     #region UnitsActions

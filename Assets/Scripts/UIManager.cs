@@ -28,8 +28,14 @@ public class UIManager : MonoBehaviour
     public Text moneyLabel;
     public Text sellButtonLabel;
 
-    public Text         crimeLimitLabel;
-    public List<Text>   crimeLabels;
+    public Text crimeLimitLabel;
+    public Text notStoppedCrimesLabel;
+    public Text stoppedCrimesLabel;
+
+    [Header("CrimeBars")]
+    public List<RectTransform>  crimeBars;
+    public List<int>            crimeBarsMinSize;
+    public int                  sizeUntilArrowMark;
 
     [Header("Images")]
     public Image        sellIconImage;
@@ -38,16 +44,23 @@ public class UIManager : MonoBehaviour
  
     public void UpdateCrimeLimitLabel(int p_crimeLimit)
     {
-        crimeLimitLabel.text = "Don't pass " + p_crimeLimit.ToString() + "!";
+        crimeLimitLabel.text = "LIMIT " + p_crimeLimit.ToString();
     }
-    public void UpdateCrimeLabels(int p_notSeen, int p_seen, int p_stopped)
+    public void UpdateCrimeBars(int p_crimeLimit, int p_notSeen, int p_seen, int p_stopped)
     {
-        crimeLabels[0].text = p_stopped.ToString();
-        crimeLabels[1].text = p_seen.ToString();
-        crimeLabels[2].text = p_seen.ToString();
-        crimeLabels[3].text = p_notSeen.ToString();
-        crimeLabels[4].text = p_notSeen.ToString();
-        crimeLabels[5].text = "= " + (p_notSeen + p_seen).ToString();
+        notStoppedCrimesLabel.text = (p_notSeen + p_seen).ToString();
+        stoppedCrimesLabel.text = p_stopped.ToString();
+
+        UpdateBar(crimeBars[0], crimeBarsMinSize[0], p_notSeen, p_crimeLimit, crimeBarsMinSize[1]);
+        UpdateBar(crimeBars[1], crimeBarsMinSize[1], p_seen, p_crimeLimit, crimeBarsMinSize[1], 0f);
+        UpdateBar(crimeBars[2], crimeBarsMinSize[2], p_stopped, p_crimeLimit);
+    }
+    private void UpdateBar(RectTransform p_bar, int p_minSize, int p_crimeCount, int p_crimeLimit, 
+        int p_extraBarOffset = 0, float p_anchorYDelta = 1f)
+    {
+        p_bar.sizeDelta = new Vector2(p_bar.sizeDelta.x,
+            (float)p_minSize + ((float)(sizeUntilArrowMark - p_minSize - p_extraBarOffset) * (float)p_crimeCount / (float)p_crimeLimit));
+        p_bar.anchoredPosition = new Vector2 (p_bar.anchoredPosition.x,  p_anchorYDelta + p_bar.sizeDelta.y / 2f);
     }
     public void EnableNormalUI(bool p_enable)
     {
