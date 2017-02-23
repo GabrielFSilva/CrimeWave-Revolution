@@ -40,6 +40,21 @@ public enum Orientation
     DOWN,
     LEFT
 }
+
+public enum SFXType
+{
+    BUTTON_PRESS,
+    ERROR,
+    UNIT_ROTATED,
+    UNIT_SOLD,
+    UNIT_BOUGHT_POLICE_CAMERA,
+    UNIT_BOUGHT_POLICE_MAN,
+    UNIT_BOUGHT_POLICE_STATION,
+    UNIT_BOUGHT_POLICE_CAR,
+    MATCH_WON,
+    MATCH_LOSS,
+    MATCH_COUNTDOWN_TICK
+}
 public class Enums
 {
     public static int GetOrientationX (Orientation p_ori)

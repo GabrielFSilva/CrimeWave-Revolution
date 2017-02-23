@@ -10,7 +10,7 @@ public class UIManager : MonoBehaviour
     public event Action         OnSellButtonClicked;
     public event Action         OnCancelButtonClicked;
     public event Action         OnRotateButtonClicked;
-
+    public event Action         OnPauseButtonClicked;
     [Header("Managers")]
     public UIUnitPlacementManager   unitPlacement;
 
@@ -102,11 +102,20 @@ public class UIManager : MonoBehaviour
         if (OnBuyButtonClicked != null)
             OnBuyButtonClicked(p_unitTypeIndex);
     }
-
     public void SellButtonPressed()
     {
         if (OnSellButtonClicked != null)
             OnSellButtonClicked();
+    }
+    public void RotateButtonPressed()
+    {
+        if (OnRotateButtonClicked != null)
+            OnRotateButtonClicked();
+    }
+    public void PauseButtonPressed()
+    {
+        if (OnPauseButtonClicked != null)
+            OnPauseButtonClicked();
     }
     public void UpdateCancelButton(int p_buttonIndex)
     {

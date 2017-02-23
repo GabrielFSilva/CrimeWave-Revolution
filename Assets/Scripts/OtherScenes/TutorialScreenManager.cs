@@ -6,6 +6,7 @@ using System.Collections.Generic;
 
 public class TutorialScreenManager : MonoBehaviour
 {
+    public SoundManager soundManager;
     public List<GameObject> slides;
     public int slideIndex = 0;
     public Text nextButton;
@@ -13,6 +14,8 @@ public class TutorialScreenManager : MonoBehaviour
 
     private void Start()
     {
+        soundManager = SoundManager.GetInstance();
+        soundManager.PlayBGM();
         UpdateSlides();
         UpdateButtons();
     }
@@ -28,6 +31,7 @@ public class TutorialScreenManager : MonoBehaviour
     }
     public void NextButtonClicked()
     {
+        soundManager.PlaySFX(SFXType.BUTTON_PRESS);
         if (slideIndex == slides.Count - 1)
             SceneManager.LoadScene("GameScene");
         else
@@ -39,6 +43,7 @@ public class TutorialScreenManager : MonoBehaviour
     }
     public void ReturnButtonClicked()
     {
+        soundManager.PlaySFX(SFXType.BUTTON_PRESS);
         if (slideIndex == 0)
             SceneManager.LoadScene("TitleScreen");
         else

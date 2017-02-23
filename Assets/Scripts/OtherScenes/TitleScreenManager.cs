@@ -5,7 +5,8 @@ using System.Collections;
 
 public class TitleScreenManager : MonoBehaviour
 {
-    public static AudioSource Bgm;
+    public SoundManager     soundManager;
+
     public GameObject logo;
     public GameObject credits;
 
@@ -17,14 +18,10 @@ public class TitleScreenManager : MonoBehaviour
     public Sprite   car0;
     public Sprite   car1;
 
-    public AudioSource bgm;
-
     private void Start()
     {
-        if (Bgm != null)
-            return;
-        Bgm = bgm;
-        GameObject.DontDestroyOnLoad(bgm.gameObject);
+        soundManager = SoundManager.GetInstance();
+        soundManager.PlayBGM();
     }
     private void Update()
     {
@@ -35,10 +32,12 @@ public class TitleScreenManager : MonoBehaviour
     }
     public void PlayClicked()
     {
+        soundManager.PlaySFX(SFXType.BUTTON_PRESS);
         SceneManager.LoadScene("TutorialScene");
     }
     public void CreditsClicked()
     {
+        soundManager.PlaySFX(SFXType.BUTTON_PRESS);
         playButton.SetActive(false);
         credits.SetActive(true);
         backButton.SetActive(true);
@@ -47,6 +46,7 @@ public class TitleScreenManager : MonoBehaviour
     }
     public void BackClicked()
     {
+        soundManager.PlaySFX(SFXType.BUTTON_PRESS);
         playButton.SetActive(true);
         credits.SetActive(false);
         backButton.SetActive(false);

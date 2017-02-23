@@ -13,15 +13,22 @@ public class GameSceneManager : MonoBehaviour
         UpdateMonitoredTiles = true;
     }
     public static int   Money { get; private set; }
+    [Header("Match Setup")]
     [SerializeField]
     private int startMoney;
+    [SerializeField]
+    private int matchDuration;
+    [SerializeField]
+    private int crimeLimit;
     #endregion
-
-    public UIManager uiManager;
-    public GridManager gridManager;
-    public BuildingManager buildingManager;
-    public UnitsManager unitsManager;
-    public CrimeManager crimeManager;
+    [Header("Managers")]
+    public SoundManager             soundManager;
+    public UIManager                uiManager;
+    public GridManager              gridManager;
+    public BuildingManager          buildingManager;
+    public UnitsManager             unitsManager;
+    public CrimeManager             crimeManager;
+    public MatchCountdownManager    matchCountdownManager;
     
     public Unit selectedUnit { get; private set; }
     public UnitType unitEditingType { get; private set; }
@@ -32,38 +39,49 @@ public class GameSceneManager : MonoBehaviour
     public GameObject   winContanier;
     public GameObject   lossContanier;
 
-    public int          crimeLimit;
 
     #region Mono
     void Start ()
     {
+        soundManager = SoundManager.GetInstance();
+        soundManager.PlayBGM();
         Instance = this;
         Time.timeScale = 1f;
         gameState = GameState.PLAYING;
         Money = startMoney;
+
         gridManager.OnStreetTileClicked += StreetTileClicked;
         gridManager.OnBuildingTileClicked += BuildingTileClicked;
         gridManager.OnCrimeStarted += CrimeStarted;
         gridManager.OnTileHover += TileHover;
+
         buildingManager.OnBuildingHovered += BuildingHovered;
+
         unitsManager.OnUnitSelected += UnitSelected;
         unitsManager.OnUnitMoved += UnitMoved;
+
         crimeManager.OnCrimeEnded += CrimeEnded;
+
         uiManager.OnBuyButtonClicked += BuyButtonClicked;
         uiManager.OnSellButtonClicked += SellButtonClicked;
+        uiManager.OnRotateButtonClicked += RotateButtonClicked;
+        uiManager.OnPauseButtonClicked += PauseButtonClicked;
+        uiManager.UpdateMoneyLabel();
         uiManager.UpdateCrimeLimitLabel(crimeLimit);
     }
 
-  
-
     private void Update()
     {
+        if (Input.GetKeyDown(KeyCode.Escape))
+            SceneManager.LoadScene("TitleScreen");
+
         if (gameState == GameState.END_GAME)
             Time.timeScale = 0f;
         else if (Input.GetKey(KeyCode.Space))
             Time.timeScale = 25f;
         else
             Time.timeScale = 1f;
+        
         if (UpdateMonitoredTiles)
         {
             UpdateMonitoredTiles = false;
@@ -75,8 +93,12 @@ public class GameSceneManager : MonoBehaviour
         if (gameState == GameState.END_GAME)
             return;
         gameTime += Time.deltaTime;
+
+        if (gameTime > (matchDuration * 29f / 30f) - 1f)
+            matchCountdownManager.StartCountdown((matchDuration * 1f / 30f));
+
         uiManager.UpdateTimeLabel(Mathf.FloorToInt(gameTime / 8f) + 1);
-        if (gameTime > 240f)
+        if (gameTime > matchDuration)
             ShowEndGameScreen(true);
         if (crimeManager.seenCrimes + crimeManager.notseenCrimes >= crimeLimit)
             ShowEndGameScreen(false);
@@ -91,12 +113,13 @@ public class GameSceneManager : MonoBehaviour
             if (unitEditingType == UnitType.POLICE_MAN || unitEditingType == UnitType.POLICE_CAR)
             {
                 unitsManager.SpawnUnit(unitEditingType, p_tile, p_tile.linkedBuilding);
-                UnitBought(unitEditingType);
+                UnitBought(unitEditingType, unitEditingType == UnitType.POLICE_MAN ? 
+                    SoundVolumes.sfxUnitBought_PoliceMan : SoundVolumes.sfxUnitBought_PoliceCar);
             }
             else if (unitEditingType == UnitType.POLICE_STATION)
             {
                 unitsManager.SpawnUnit(unitEditingType, p_tile);
-                UnitBought(unitEditingType);
+                UnitBought(unitEditingType, SoundVolumes.sfxUnitBought_PoliceStation);
             }
         }
     }
@@ -106,7 +129,7 @@ public class GameSceneManager : MonoBehaviour
         if (gameState == GameState.BUYING && unitEditingType == UnitType.POLICE_CAMERA)
         {
             unitsManager.SpawnUnit(UnitType.POLICE_CAMERA, p_tile);
-            UnitBought(unitEditingType);
+            UnitBought(unitEditingType, SoundVolumes.sfxUnitBought_PoliceCamera);
         }
     }
     private void TileHover(GridTile p_tile, int p_hoverStatus)
@@ -139,13 +162,14 @@ public class GameSceneManager : MonoBehaviour
     }
     #endregion
     #region UnitsActions
-    private void UnitBought(UnitType p_type)
+    private void UnitBought(UnitType p_type, float p_sfxVolume)
     {
-        Money -= GameEconomy.GetUnitBuyPrice(UnitType.POLICE_STATION);
+        Money -= GameEconomy.GetUnitBuyPrice(p_type);
         uiManager.UpdateMoneyLabel();
         uiManager.unitPlacement.ResetUnits();
         UpdateMonitoredTiles = true;
         ReturnToNormalState();
+        soundManager.PlaySFX(SFXType.UNIT_BOUGHT_POLICE_CAMERA + (int)p_type, p_sfxVolume);
     }
     private void UnitMoved(Unit obj)
     {
@@ -176,6 +200,10 @@ public class GameSceneManager : MonoBehaviour
     }
     public void ShowEndGameScreen(bool p_isWin)
     {
+        if (p_isWin)
+            soundManager.PlaySFX(SFXType.MATCH_WON, SoundVolumes.sfxUnitBought_MatchWon);
+        else
+            soundManager.PlaySFX(SFXType.MATCH_LOSS, SoundVolumes.sfxUnitBought_MatchLost);
         Time.timeScale = 0f;
         gameState = GameState.END_GAME;
         endScreenContanier.SetActive(true);
@@ -191,11 +219,16 @@ public class GameSceneManager : MonoBehaviour
             gameState = GameState.PLAYING;
         }
         else if (p_unityTypeIndex == 5)
+        {
             CancelButtonClicked();
+            soundManager.PlaySFX(SFXType.ERROR, SoundVolumes.sfxError);
+        }
         else if (GameEconomy.HaveEnoughMoney((UnitType)p_unityTypeIndex, Money))
         {
+            soundManager.PlaySFX(SFXType.BUTTON_PRESS, SoundVolumes.sfxButtonPress);
             if (gameState == GameState.BUYING)
             {
+                uiManager.unitPlacement.ResetUnits();
                 if (unitEditingType == UnitType.POLICE_CAMERA)
                     gridManager.EnableTilePlacementIcons(false, TileType.STREET);
                 else
@@ -209,14 +242,15 @@ public class GameSceneManager : MonoBehaviour
             else
                 gridManager.EnableTilePlacementIcons(true, TileType.BUILDING);
         }
-        //else
-        //  ERROR SOUND
+        else
+            soundManager.PlaySFX(SFXType.ERROR, SoundVolumes.sfxError);
     }
     private void SellButtonClicked()
     {
         if (gameState != GameState.EDITING)
             return;
         Money += GameEconomy.GetUnitSellPrice(selectedUnit.unitType);
+        soundManager.PlaySFX(SFXType.UNIT_SOLD, SoundVolumes.sfxUnitSold);
         unitsManager.RemoveUnit(selectedUnit);
         uiManager.UpdateMoneyLabel();
         ReturnToNormalState();
@@ -224,23 +258,30 @@ public class GameSceneManager : MonoBehaviour
     public void RotateButtonClicked()
     {
         if (selectedUnit.unitType == UnitType.POLICE_CAMERA)
+        {
             selectedUnit.RotateUnit();
+            soundManager.PlaySFX(SFXType.UNIT_ROTATED, SoundVolumes.sfxUnitRotated);
+        }
+    }
+    public void PauseButtonClicked()
+    {
+        soundManager.PlaySFX(SFXType.BUTTON_PRESS, SoundVolumes.sfxButtonPress);
+        SceneManager.LoadScene("TitleScreen");
     }
     public void CancelButtonClicked()
     {
         uiManager.unitPlacement.ResetUnits();
         ReturnToNormalState();
     }
-
-    
     public void PlayAgainButtonClicked()
     {
+        soundManager.PlaySFX(SFXType.BUTTON_PRESS, SoundVolumes.sfxButtonPress);
         SceneManager.LoadScene("GameScene");
     }
     public void MenuButtonClicked()
     {
+        soundManager.PlaySFX(SFXType.BUTTON_PRESS, SoundVolumes.sfxButtonPress);
         SceneManager.LoadScene("TitleScreen");
     }
     #endregion
-    
 }
