@@ -41,7 +41,17 @@ public class UIManager : MonoBehaviour
     public Image        sellIconImage;
     public List<Sprite> sellIconSprites;
 
- 
+    private void Update()
+    {
+        if (Input.GetKeyDown(KeyCode.Alpha1) || Input.GetKeyDown(KeyCode.Keypad1))
+            OnBuyButtonClicked(0);
+        else if (Input.GetKeyDown(KeyCode.Alpha2) || Input.GetKeyDown(KeyCode.Keypad2))
+            OnBuyButtonClicked(1);
+        else if (Input.GetKeyDown(KeyCode.Alpha3) || Input.GetKeyDown(KeyCode.Keypad3))
+            OnBuyButtonClicked(2);
+        else if (Input.GetKeyDown(KeyCode.Alpha4) || Input.GetKeyDown(KeyCode.Keypad4))
+            OnBuyButtonClicked(3);
+    }
     public void UpdateCrimeLimitLabel(int p_crimeLimit)
     {
         crimeLimitLabel.text = "LIMIT " + p_crimeLimit.ToString();

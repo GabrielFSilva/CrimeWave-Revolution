@@ -49,6 +49,7 @@ public class GameSceneManager : MonoBehaviour
         Time.timeScale = 1f;
         gameState = GameState.PLAYING;
         Money = startMoney;
+        unitEditingType = (UnitType)5;
 
         gridManager.OnStreetTileClicked += StreetTileClicked;
         gridManager.OnBuildingTileClicked += BuildingTileClicked;
@@ -218,7 +219,7 @@ public class GameSceneManager : MonoBehaviour
         {
             gameState = GameState.PLAYING;
         }
-        else if (p_unityTypeIndex == 5)
+        else if (p_unityTypeIndex == 5 || p_unityTypeIndex == (int)unitEditingType)
         {
             CancelButtonClicked();
             soundManager.PlaySFX(SFXType.ERROR, SoundVolumes.sfxError);
