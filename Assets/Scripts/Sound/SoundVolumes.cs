@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class SoundVolumes : MonoBehaviour
 {
-    public static float bgmVolume = 0.6f;
+    public static float bgmVolume = 0.2f;
     public static float sfxButtonPress = 1.0f;
     public static float sfxError = 1.0f;
     public static float sfxUnitRotated = 1.0f;
