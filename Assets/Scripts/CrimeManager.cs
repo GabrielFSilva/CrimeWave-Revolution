@@ -4,15 +4,17 @@ using System.Collections.Generic;
 
 public class CrimeManager : MonoBehaviour
 {
-    public event Action     OnCrimeEnded;
+    public event Action<int>    OnCrimeCountChange;
+    public event Action         OnCrimeEnded;
+
     public GridManager      gridManager;
     public GameObject       crimePrefab;
     public Transform        crimesContainer;
     public GameObject       crimeResultPrefab;
 
-    public List<Crime> crimes;
-    public static float CrimesPerSecond = 1f;
-    public static float CrimesVariation = 0.3f;
+    public List<Crime>      crimes;
+    public static float     CrimesPerSecond = 1f;
+    public static float     CrimesVariation = 0.3f;
 
     public int notseenCrimes = 0;
     public int seenCrimes = 0;
@@ -112,14 +114,21 @@ public class CrimeManager : MonoBehaviour
                .GetComponent<CrimeResult>();
             if (p_crime.stopped)
             {
+                OnCrimeCountChange(2);
                 stoppedCrimes++;
                 __result.sprite.sprite = stoppedSprite;
             }
             else
+            {
+                OnCrimeCountChange(1);
                 seenCrimes++;
+            }
         }
         else
+        {
+            OnCrimeCountChange(0);
             notseenCrimes++;
+        }
 
         crimes.Remove(p_crime);
         Destroy(p_crime.gameObject);

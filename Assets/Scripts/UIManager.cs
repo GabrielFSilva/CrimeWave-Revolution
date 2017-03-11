@@ -6,11 +6,11 @@ using System.Collections.Generic;
 public class UIManager : MonoBehaviour
 {
     //Actions
-    public event Action<int>    OnBuyButtonClicked;
-    public event Action         OnSellButtonClicked;
-    public event Action         OnCancelButtonClicked;
-    public event Action         OnRotateButtonClicked;
-    public event Action         OnPauseButtonClicked;
+    public event Action<int, bool>  OnBuyButtonClicked;
+    public event Action             OnSellButtonClicked;
+    public event Action             OnCancelButtonClicked;
+    public event Action             OnRotateButtonClicked;
+    public event Action             OnPauseButtonClicked;
     [Header("Managers")]
     public UIUnitPlacementManager   unitPlacement;
 
@@ -34,6 +34,7 @@ public class UIManager : MonoBehaviour
 
     [Header("CrimeBars")]
     public List<RectTransform>  crimeBars;
+    public List<Animator>       crimeBarsAnimators;
     public List<int>            crimeBarsMinSize;
     public int                  sizeUntilArrowMark;
 
@@ -44,13 +45,13 @@ public class UIManager : MonoBehaviour
     private void Update()
     {
         if (Input.GetKeyDown(KeyCode.Alpha1) || Input.GetKeyDown(KeyCode.Keypad1))
-            OnBuyButtonClicked(0);
+            OnBuyButtonClicked(0, true);
         else if (Input.GetKeyDown(KeyCode.Alpha2) || Input.GetKeyDown(KeyCode.Keypad2))
-            OnBuyButtonClicked(1);
+            OnBuyButtonClicked(1, true);
         else if (Input.GetKeyDown(KeyCode.Alpha3) || Input.GetKeyDown(KeyCode.Keypad3))
-            OnBuyButtonClicked(2);
+            OnBuyButtonClicked(2, true);
         else if (Input.GetKeyDown(KeyCode.Alpha4) || Input.GetKeyDown(KeyCode.Keypad4))
-            OnBuyButtonClicked(3);
+            OnBuyButtonClicked(3, true);
     }
     public void UpdateCrimeLimitLabel(int p_crimeLimit)
     {
@@ -64,6 +65,10 @@ public class UIManager : MonoBehaviour
         UpdateBar(crimeBars[0], crimeBarsMinSize[0], p_notSeen, p_crimeLimit, crimeBarsMinSize[1]);
         UpdateBar(crimeBars[1], crimeBarsMinSize[1], p_seen, p_crimeLimit, crimeBarsMinSize[1], 0f);
         UpdateBar(crimeBars[2], crimeBarsMinSize[2], p_stopped, p_crimeLimit);
+    }
+    public void BlinkCrimeBar(int p_barIndex)
+    {
+        crimeBarsAnimators[p_barIndex].SetTrigger("Blink");
     }
     private void UpdateBar(RectTransform p_bar, int p_minSize, int p_crimeCount, int p_crimeLimit, 
         int p_extraBarOffset = 0, float p_anchorYDelta = 1f)
@@ -110,7 +115,7 @@ public class UIManager : MonoBehaviour
     public void BuyButtonPressed(int p_unitTypeIndex)
     {
         if (OnBuyButtonClicked != null)
-            OnBuyButtonClicked(p_unitTypeIndex);
+            OnBuyButtonClicked(p_unitTypeIndex, false);
     }
     public void SellButtonPressed()
     {

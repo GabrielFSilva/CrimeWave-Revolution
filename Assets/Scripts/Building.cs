@@ -13,8 +13,6 @@ public class Building : MonoBehaviour
     public BuildingRoute route;
     public List<GridTile> buildingRoute;
     public List<Orientation> buildingRouteOrientation;
-    
-    private bool _routePainted = false;
 
     public void Setup()
     {

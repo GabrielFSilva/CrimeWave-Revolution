@@ -61,6 +61,7 @@ public class GameSceneManager : MonoBehaviour
         unitsManager.OnUnitSelected += UnitSelected;
         unitsManager.OnUnitMoved += UnitMoved;
 
+        crimeManager.OnCrimeCountChange += CrimeCountChange;
         crimeManager.OnCrimeEnded += CrimeEnded;
 
         uiManager.OnBuyButtonClicked += BuyButtonClicked;
@@ -69,6 +70,11 @@ public class GameSceneManager : MonoBehaviour
         uiManager.OnPauseButtonClicked += PauseButtonClicked;
         uiManager.UpdateMoneyLabel();
         uiManager.UpdateCrimeLimitLabel(crimeLimit);
+    }
+
+    private void CrimeCountChange(int p_crimeType)
+    {
+        uiManager.BlinkCrimeBar(p_crimeType);
     }
 
     private void Update()
@@ -213,13 +219,16 @@ public class GameSceneManager : MonoBehaviour
     }
     #endregion
     #region UI_Input
-    private void BuyButtonClicked(int p_unityTypeIndex)
+    private void BuyButtonClicked(int p_unityTypeIndex, bool p_hotkey)
     {
-        if (p_unityTypeIndex < 0)
+        if (gameState != GameState.BUYING && gameState != GameState.PLAYING)
+            return;
+        else if (p_unityTypeIndex < 0)
         {
             gameState = GameState.PLAYING;
         }
-        else if (p_unityTypeIndex == 5 || p_unityTypeIndex == (int)unitEditingType)
+        else if (p_unityTypeIndex == 5 || 
+            (p_unityTypeIndex == (int)unitEditingType && gameState != GameState.PLAYING))
         {
             CancelButtonClicked();
             soundManager.PlaySFX(SFXType.ERROR, SoundVolumes.sfxError);
@@ -253,6 +262,7 @@ public class GameSceneManager : MonoBehaviour
         Money += GameEconomy.GetUnitSellPrice(selectedUnit.unitType);
         soundManager.PlaySFX(SFXType.UNIT_SOLD, SoundVolumes.sfxUnitSold);
         unitsManager.RemoveUnit(selectedUnit);
+        UpdateMonitoredTiles = true;
         uiManager.UpdateMoneyLabel();
         ReturnToNormalState();
     }
