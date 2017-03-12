@@ -1,12 +1,16 @@
 ﻿using UnityEngine;
+using UnityEngine.UI;
 using UnityEngine.EventSystems;
 
 public class Tooltip : MonoBehaviour
 {
-    public EventTrigger trigger;
-    public GameObject   tooltipContainer;
+    public EventTrigger     trigger;
+    public GameObject       tooltipContainer;
 
-	void Start ()
+    public Image            triggerImage;
+    public RectTransform    targetBar;
+
+	private void Start ()
     {
         EventTrigger.Entry __entry = new EventTrigger.Entry();
         
@@ -20,6 +24,11 @@ public class Tooltip : MonoBehaviour
         trigger.triggers.Add(__entry);
     }
 
+    private void Update()
+    {
+        if (targetBar != null)
+            triggerImage.rectTransform.sizeDelta = targetBar.sizeDelta;
+    }
     public void OnPointerEnterDelegate(PointerEventData data)
     {
         tooltipContainer.gameObject.SetActive(true);
