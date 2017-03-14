@@ -33,13 +33,15 @@ public class GameSceneManager : MonoBehaviour
     public Unit selectedUnit { get; private set; }
     public UnitType unitEditingType { get; private set; }
 
-    public float gameTime = 0f;
+    public float        gameTime = 0f;
+    [SerializeField]
+    private float       fowardSpeed;
+    public bool         fowardPressed = false;
 
     public GameObject   endScreenContanier;
     public GameObject   winContanier;
     public GameObject   lossContanier;
-
-
+    
     #region Mono
     void Start ()
     {
@@ -68,9 +70,11 @@ public class GameSceneManager : MonoBehaviour
         uiManager.OnSellButtonClicked += SellButtonClicked;
         uiManager.OnRotateButtonClicked += RotateButtonClicked;
         uiManager.OnPauseButtonClicked += PauseButtonClicked;
+        uiManager.OnFowardButtonClicked += FowardButtonClicked;
         uiManager.UpdateMoneyLabel();
         uiManager.UpdateCrimeLimitLabel(crimeLimit);
     }
+
 
     private void CrimeCountChange(int p_crimeType)
     {
@@ -84,8 +88,8 @@ public class GameSceneManager : MonoBehaviour
 
         if (gameState == GameState.END_GAME)
             Time.timeScale = 0f;
-        else if (Input.GetKey(KeyCode.Space))
-            Time.timeScale = 25f;
+        else if (fowardPressed)
+            Time.timeScale = fowardSpeed;
         else
             Time.timeScale = 1f;
         
@@ -293,6 +297,11 @@ public class GameSceneManager : MonoBehaviour
     {
         soundManager.PlaySFX(SFXType.BUTTON_PRESS, SoundVolumes.sfxButtonPress);
         SceneManager.LoadScene("TitleScreen");
+    }
+
+    private void FowardButtonClicked(bool p_pressed)
+    {
+        fowardPressed = p_pressed;
     }
     #endregion
 }

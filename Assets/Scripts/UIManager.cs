@@ -8,9 +8,10 @@ public class UIManager : MonoBehaviour
     //Actions
     public event Action<int, bool>  OnBuyButtonClicked;
     public event Action             OnSellButtonClicked;
-    public event Action             OnCancelButtonClicked;
     public event Action             OnRotateButtonClicked;
     public event Action             OnPauseButtonClicked;
+    public event Action<bool>       OnFowardButtonClicked;
+
     [Header("Managers")]
     public UIUnitPlacementManager   unitPlacement;
 
@@ -141,5 +142,11 @@ public class UIManager : MonoBehaviour
         }
         else
             cancelButton.gameObject.SetActive(false);
+    }
+
+    public void ForwardButtonPressed(bool p_pressed)
+    {
+        if (OnFowardButtonClicked != null)
+            OnFowardButtonClicked(p_pressed);
     }
 }
