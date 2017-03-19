@@ -10,9 +10,8 @@ public class TitleScreenManager : MonoBehaviour
     public GameObject logo;
     public GameObject credits;
 
-    public GameObject playButton;
-    public GameObject backButton;
-    public GameObject creditsButton;
+    public GameObject titleContainer;
+    public GameObject creditsContainer;
 
     public Image    carImage;
     public Sprite   car0;
@@ -33,24 +32,35 @@ public class TitleScreenManager : MonoBehaviour
     public void PlayClicked()
     {
         soundManager.PlaySFX(SFXType.BUTTON_PRESS);
+        if (PlayerPrefs.HasKey("SeenTutorial"))
+            SceneManager.LoadScene("GameScene");
+        else
+        {
+            PlayerPrefs.SetInt("SeenTutorial", 1);
+            SceneManager.LoadScene("TutorialScene");
+        }
+    }
+    public void TutorialClicked()
+    {
+        soundManager.PlaySFX(SFXType.BUTTON_PRESS);
         SceneManager.LoadScene("TutorialScene");
     }
     public void CreditsClicked()
     {
         soundManager.PlaySFX(SFXType.BUTTON_PRESS);
-        playButton.SetActive(false);
-        credits.SetActive(true);
-        backButton.SetActive(true);
-        creditsButton.SetActive(false);
-        logo.SetActive(false);
+        titleContainer.SetActive(false);
+        creditsContainer.SetActive(true);
+    }
+    public void ExitClicked()
+    {
+        soundManager.PlaySFX(SFXType.BUTTON_PRESS);
+        Application.Quit();
     }
     public void BackClicked()
     {
+        Debug.Log("here");
         soundManager.PlaySFX(SFXType.BUTTON_PRESS);
-        playButton.SetActive(true);
-        credits.SetActive(false);
-        backButton.SetActive(false);
-        creditsButton.SetActive(true);
-        logo.SetActive(true);
+        titleContainer.SetActive(true);
+        creditsContainer.SetActive(false);
     }
 }

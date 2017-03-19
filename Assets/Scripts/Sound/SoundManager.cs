@@ -29,7 +29,11 @@ public class SoundManager : MonoBehaviour
 	//Audio Clips
 	public AudioClip			bgmClip;
     public List<AudioClip>      sfxClips;
-    
+
+    //Audio Volumes
+    private bool bgmMute = false;
+    private bool sfxMute = false;
+
 	private void LoadSounds()
 	{
 		bgmAudioSource = new GameObject("BGMAudioSource", typeof(AudioSource)).GetComponent<AudioSource>();
@@ -77,4 +81,14 @@ public class SoundManager : MonoBehaviour
 		if (sfxCounter == sfxAudioSources.Count)
 			sfxCounter = 0;
 	}
+
+    public void InvertBGMVolume()
+    {
+        bgmAudioSource.mute = !bgmAudioSource.mute;
+    }
+    public void InvertSFXVolume()
+    {
+        foreach (AudioSource __as in sfxAudioSources)
+            __as.mute =! __as.mute;
+    }
 }

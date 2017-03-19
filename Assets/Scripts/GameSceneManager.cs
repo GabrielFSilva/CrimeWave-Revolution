@@ -37,7 +37,7 @@ public class GameSceneManager : MonoBehaviour
     [SerializeField]
     private float       fowardSpeed;
     public bool         fowardPressed = false;
-
+    public GameState stateBeforePause = GameState.PLAYING;
     public GameObject   endScreenContanier;
     public GameObject   winContanier;
     public GameObject   lossContanier;
@@ -69,13 +69,13 @@ public class GameSceneManager : MonoBehaviour
         uiManager.OnBuyButtonClicked += BuyButtonClicked;
         uiManager.OnSellButtonClicked += SellButtonClicked;
         uiManager.OnRotateButtonClicked += RotateButtonClicked;
-        uiManager.OnPauseButtonClicked += PauseButtonClicked;
         uiManager.OnFowardButtonClicked += FowardButtonClicked;
+        uiManager.OnPauseButtonClicked += PauseButtonClicked;
+        uiManager.OnPauseScreenButtonClicked += PauseScreenButtonClicked;
         uiManager.UpdateMoneyLabel();
         uiManager.UpdateCrimeLimitLabel(crimeLimit);
     }
-
-
+    
     private void CrimeCountChange(int p_crimeType)
     {
         uiManager.BlinkCrimeBar(p_crimeType);
@@ -86,7 +86,7 @@ public class GameSceneManager : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.Escape))
             SceneManager.LoadScene("TitleScreen");
 
-        if (gameState == GameState.END_GAME)
+        if (gameState == GameState.END_GAME || gameState == GameState.PAUSED)
             Time.timeScale = 0f;
         else if (fowardPressed)
             Time.timeScale = fowardSpeed;
@@ -278,11 +278,7 @@ public class GameSceneManager : MonoBehaviour
             soundManager.PlaySFX(SFXType.UNIT_ROTATED, SoundVolumes.sfxUnitRotated);
         }
     }
-    public void PauseButtonClicked()
-    {
-        soundManager.PlaySFX(SFXType.BUTTON_PRESS, SoundVolumes.sfxButtonPress);
-        SceneManager.LoadScene("TitleScreen");
-    }
+    
     public void CancelButtonClicked()
     {
         uiManager.unitPlacement.ResetUnits();
@@ -302,6 +298,49 @@ public class GameSceneManager : MonoBehaviour
     private void FowardButtonClicked(bool p_pressed)
     {
         fowardPressed = p_pressed;
+    }
+
+    public void PauseButtonClicked()
+    {
+        soundManager.PlaySFX(SFXType.BUTTON_PRESS, SoundVolumes.sfxButtonPress);
+        if (gameState == GameState.PAUSED)
+        {
+            gameState = stateBeforePause;
+            uiManager.pauseScreen.gameObject.SetActive(false);
+        }
+        else
+        {
+            stateBeforePause = gameState;
+            gameState = GameState.PAUSED;
+            uiManager.pauseScreen.gameObject.SetActive(true);
+        }
+    }
+    private void PauseScreenButtonClicked(int p_buttonID)
+    {
+        //Resume
+        if (p_buttonID == 0)
+            PauseButtonClicked();
+        //Restart
+        else if (p_buttonID == 1)
+            PlayAgainButtonClicked();
+        //BGM
+        else if (p_buttonID == 2)
+        {
+            soundManager.InvertBGMVolume();
+            soundManager.PlaySFX(SFXType.BUTTON_PRESS, SoundVolumes.sfxButtonPress);
+        }
+        //SFX
+        else if (p_buttonID == 3)
+        {
+            soundManager.InvertSFXVolume();
+            soundManager.PlaySFX(SFXType.BUTTON_PRESS, SoundVolumes.sfxButtonPress);
+        }
+        //Quit
+        else if (p_buttonID == 4)
+        {
+            soundManager.PlaySFX(SFXType.BUTTON_PRESS, SoundVolumes.sfxButtonPress);
+            Application.Quit();
+        }
     }
     #endregion
 }

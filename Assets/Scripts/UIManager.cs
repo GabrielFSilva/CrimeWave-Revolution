@@ -9,8 +9,9 @@ public class UIManager : MonoBehaviour
     public event Action<int, bool>  OnBuyButtonClicked;
     public event Action             OnSellButtonClicked;
     public event Action             OnRotateButtonClicked;
-    public event Action             OnPauseButtonClicked;
     public event Action<bool>       OnFowardButtonClicked;
+    public event Action             OnPauseButtonClicked;
+    public event Action<int>        OnPauseScreenButtonClicked;
 
     [Header("Managers")]
     public UIUnitPlacementManager   unitPlacement;
@@ -18,6 +19,7 @@ public class UIManager : MonoBehaviour
     [Header("State Containers")]
     public RectTransform        normalUIContainer;
     public RectTransform        sellUIContanier;
+    public RectTransform        pauseScreen;
 
     [Header("Buttons")]
     public List<RectTransform>  buyButtons;
@@ -148,5 +150,11 @@ public class UIManager : MonoBehaviour
     {
         if (OnFowardButtonClicked != null)
             OnFowardButtonClicked(p_pressed);
+    }
+
+    public void PauseScreenButtonClicked(int p_buttonID)
+    {
+        if (OnPauseScreenButtonClicked != null)
+            OnPauseScreenButtonClicked(p_buttonID);
     }
 }
