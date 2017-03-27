@@ -326,12 +326,20 @@ public class GameSceneManager : MonoBehaviour
         //BGM
         else if (p_buttonID == 2)
         {
+            if (uiManager.bgmIcon.sprite == uiManager.bgmIcons[0])
+                uiManager.bgmIcon.sprite = uiManager.bgmIcons[1];
+            else
+                uiManager.bgmIcon.sprite = uiManager.bgmIcons[0];
             soundManager.InvertBGMVolume();
             soundManager.PlaySFX(SFXType.BUTTON_PRESS, SoundVolumes.sfxButtonPress);
         }
         //SFX
         else if (p_buttonID == 3)
         {
+            if (uiManager.sfxIcon.sprite == uiManager.sfxIcons[0])
+                uiManager.sfxIcon.sprite = uiManager.sfxIcons[1];
+            else
+                uiManager.sfxIcon.sprite = uiManager.sfxIcons[0];
             soundManager.InvertSFXVolume();
             soundManager.PlaySFX(SFXType.BUTTON_PRESS, SoundVolumes.sfxButtonPress);
         }
@@ -339,7 +347,7 @@ public class GameSceneManager : MonoBehaviour
         else if (p_buttonID == 4)
         {
             soundManager.PlaySFX(SFXType.BUTTON_PRESS, SoundVolumes.sfxButtonPress);
-            Application.Quit();
+            SceneManager.LoadScene("TitleScreen");
         }
     }
     #endregion

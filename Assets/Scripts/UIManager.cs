@@ -44,6 +44,10 @@ public class UIManager : MonoBehaviour
     [Header("Images")]
     public Image        sellIconImage;
     public List<Sprite> sellIconSprites;
+    public Image        bgmIcon;
+    public List<Sprite> bgmIcons;
+    public Image        sfxIcon;
+    public List<Sprite> sfxIcons;
 
     private void Update()
     {
