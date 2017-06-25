@@ -81,14 +81,23 @@ public class SoundManager : MonoBehaviour
 		if (sfxCounter == sfxAudioSources.Count)
 			sfxCounter = 0;
 	}
-
+    public bool GetBgmMute()
+    {
+        return bgmMute;
+    }
+    public bool GetSfxMute()
+    {
+        return sfxMute;
+    }
     public void InvertBGMVolume()
     {
         bgmAudioSource.mute = !bgmAudioSource.mute;
+        bgmMute = !bgmMute;
     }
     public void InvertSFXVolume()
     {
         foreach (AudioSource __as in sfxAudioSources)
             __as.mute =! __as.mute;
+        sfxMute = !sfxMute;
     }
 }

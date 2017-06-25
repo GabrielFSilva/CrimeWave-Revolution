@@ -49,6 +49,10 @@ public class UIManager : MonoBehaviour
     public Image        sfxIcon;
     public List<Sprite> sfxIcons;
 
+    private void Start()
+    {
+        UpdateAudioButton();
+    }
     private void Update()
     {
         if (Input.GetKeyDown(KeyCode.Alpha1) || Input.GetKeyDown(KeyCode.Keypad1))
@@ -60,6 +64,17 @@ public class UIManager : MonoBehaviour
         else if (Input.GetKeyDown(KeyCode.Alpha4) || Input.GetKeyDown(KeyCode.Keypad4))
             OnBuyButtonClicked(3, true);
     }
+    public void UpdateAudioButton()
+    {
+        if (SoundManager.GetInstance().GetBgmMute())
+            bgmIcon.sprite = bgmIcons[1];
+        else
+            bgmIcon.sprite = bgmIcons[0];
+        if (SoundManager.GetInstance().GetSfxMute())
+            sfxIcon.sprite = sfxIcons[1];
+        else
+            sfxIcon.sprite = sfxIcons[0];
+    } 
     public void UpdateCrimeLimitLabel(int p_crimeLimit)
     {
         crimeLimitLabel.text = "LIMIT " + p_crimeLimit.ToString();
